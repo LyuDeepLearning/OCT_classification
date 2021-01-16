@@ -7,7 +7,9 @@ PyTorch project for OCT images classification based on transfer learning
 1.下载数据集:http://dx.doi.org/10.17632/rscbjbr9sj.2  
   下载公开数据集OCT2017.tar.gz,放在和split_train_val.py同目录下，解压，得到OCT2017文件夹  
   OCT2017数据集（四种类别）包含train和test,所以需要自行划分验证集val  
+
 2.运行split_train_val.py,从train中每一类抽取250张作为验证集  
+
 3.下载预训练模型    
 vgg19_bn:  
 https://download.pytorch.org/models/vgg19_bn-c79401a0.pth  
@@ -25,6 +27,6 @@ https://download.pytorch.org/models/resnet50-19c8e357.pth
 运行TransferLearning.py即可训练模型  
 运行predict.py即可使用训练好的模型来预测指定文件夹中的图片的类别  
 
-
+5.运行tensorboard --logdirs=log可对模型训练过程中训练集和验证集的loss变化情况进行可视化
 
 
