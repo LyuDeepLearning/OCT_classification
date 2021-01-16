@@ -4,6 +4,7 @@ import torch
 
 # inceptionV3模型稍作修改，准备迁移学习
 def net(pre=True):
+    # network = models.inception_v3(pretrained=True)#用于获取预训练模型下载链接
     network = models.inception_v3(pretrained=False)#后面指定路径加载
     # print(network)
     network.aux_logits = False
@@ -22,7 +23,7 @@ def net(pre=True):
         nn.Linear(256,4)
     )
     path = 'inception_v3.pth'
-    if pre == True:
+    if pre == True:#pre==True表示加载预训练参数
         pretrained_dict = torch.load(path)
         net_dict = network.state_dict()
         # 1. filter out unnecessary keys

@@ -13,7 +13,7 @@ from network import net
 import torch.nn as nn
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-path='../OCT_classification_vgg19/OCT2017'
+path='../OCT2017'
 # path = "OCT2017"
 train_path = 'train'
 val_path = 'val'
@@ -27,7 +27,7 @@ train_transform = transforms.Compose \
 
         transforms.RandomHorizontalFlip(p=0.1),
         transforms.RandomVerticalFlip(p=0.1),
-        transforms.RandomApply(t, p=0.1),
+        transforms.RandomApply(t, p=0.1),#使用了上面定义的t
         transforms.Resize(size=(224, 224)),
         transforms.ToTensor(),  # range [0, 255] -> [0.0,1.0]
         transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
@@ -59,8 +59,11 @@ def data_loader(train_img, batch_size, shuffle=True, num_workers=1):
 def model(train_orig, val_orig, learn_rate=0.0003, num_epochs=32, batch_size=32):
     train_loader = data_loader(train_orig, batch_size=batch_size)
     val_loader = data_loader(val_orig, batch_size=batch_size, shuffle=False)
-    network = net(False).to(device)
-    network.load_state_dict(torch.load('net_params_end.pkl'))
+    network = net().to(device)
+
+    #加载上一次中断的训练结果，继续训练
+    network.load_state_dict(torch.load('net_params.pkl'))
+    
     optimizer = torch.optim.Adam(filter(lambda p: p.requires_grad, network.parameters()),
                                  lr=learn_rate, weight_decay=0.0001)
     # weight_decay=0.0005,L2-正则化防止过拟合
@@ -138,7 +141,7 @@ def model(train_orig, val_orig, learn_rate=0.0003, num_epochs=32, batch_size=32)
         print(f'Training Accuracy: {100 * train_acc:.2f}% \t Validation Accuracy: {100 * val_acc:.2f}%')
         writer.add_scalars('CrossEntropyLoss', {'train_loss': train_loss, 'val_loss': val_loss}, epoch)
         writer.add_scalars('accuracy', {'train_acc': train_acc, 'val_acc': val_acc}, epoch)
-    torch.save(network.state_dict(), "net_params_end.pkl")
+    #torch.save(network.state_dict(), "net_params_end.pkl")#保留训练停止时的模型
     '''all epoch ends'''
     print(f'\nBest epoch: {best_epoch} with loss: {val_loss_min:.2f} and acc: {100 * val_best_acc:.2f}%')
     writer.close()  # 程序推出前需要关闭writer，类似文件读写。
@@ -153,7 +156,7 @@ def model(train_orig, val_orig, learn_rate=0.0003, num_epochs=32, batch_size=32)
     model_dict = model.load_state_dict(torch.load(PATH))
     '''
 
-
+#计算测试集上的准确率
 def accuracy(dataset, batchsize=32):
     network = net(False).to(device)
     network.load_state_dict(torch.load('net_params.pkl'))
@@ -175,7 +178,7 @@ def accuracy(dataset, batchsize=32):
     print(total)
     print('the accuracy on test_set is {:.4f}'.format(correct / total))
 
-#统计混淆矩阵
+#计算混淆矩阵
 import numpy as np
 def confusion_matrix(dataset, batchsize=16):
     network = net(False).to(device)
@@ -196,10 +199,11 @@ def confusion_matrix(dataset, batchsize=16):
 
 
 if __name__ == '__main__':
-    # model(train_orig,val_orig)  # 训练
-    '''用训练好的模型统计测试集的准确率'''
+    model(train_orig,val_orig)  # 训练
+
+    '''用训练好的模型计算测试集的准确率、混淆矩阵'''
     # accuracy(test_orig)
-    confusion_matrix(test_orig)
+    # confusion_matrix(test_orig)
 
 
 

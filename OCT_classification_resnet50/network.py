@@ -2,27 +2,12 @@ from torchvision import models
 from torch import nn
 import torch
 
-# class Net(nn.Module):
-#     def __init__(self, model):
-#         super(Net, self).__init__()
-#         # -2表示去掉model的后两层
-#         self.res_layer = nn.Sequential(*list(model.children())[:-2])
-#         self.transion_layer = nn.ConvTranspose2d(2048, 2048, kernel_size=14, stride=3)
-#         self.pool_layer = nn.MaxPool2d(32)
-#         self.Linear_layer = nn.Linear(2048, 4)
-#
-#     def forward(self, x):
-#         x = self.resnet_layer(x)
-#         x = self.transion_layer(x)
-#         x = self.pool_layer(x)
-#         #将一个多行的Tensor,拼接成一行,-1指在不告诉函数有多少列
-#         x = x.view(x.size(0), -1)
-#         x = self.Linear_layer(x)
-#         return x
+
 
 
 # resnet模型稍作修改，准备迁移学习
 def net(pre=True):
+    # network = models.resnet50(pretrained=True)#用于获取预训练模型下载链接
     network = models.resnet50(pretrained=False)#后面指定路径加载
     # print(network)
     # Dropout(p=0.5, inplace=False)
@@ -38,7 +23,7 @@ def net(pre=True):
         nn.Linear(256,4)
     )
     pthfile = 'resnet50.pth'
-    if pre == True:
+    if pre == True:#pre==True表示加载预训练参数
         pretrained_dict = torch.load(pthfile)
         net_dict = network.state_dict()
         # 1. filter out unnecessary keys

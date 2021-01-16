@@ -16,7 +16,7 @@ transform = transforms.Compose\
 
 
 #2.加载网络及参数
-network =net().to(device)
+network =net(False).to(device)
 network.load_state_dict(torch.load('net_params.pkl'))
 print("OCT影像识别系统加载成功")
 

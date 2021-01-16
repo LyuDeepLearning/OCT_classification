@@ -5,6 +5,7 @@ import torch
 
 # VGG16模型稍作修改，准备迁移学习
 def net(pre=True):
+    # network = models.vgg19_bn(pretrained=True)#用于获取预训练模型下载链接
     network = models.vgg19_bn(pretrained=False)
     # print(network)
     # Dropout(p=0.5, inplace=False)
@@ -18,7 +19,7 @@ def net(pre=True):
         nn.Dropout(p=0.5),
         nn.Linear(in_features=1024, out_features=4))
     path='vgg19_bn.pth'
-    if pre==True:
+    if pre==True:#pre==True表示加载预训练参数
         pretrained_dict=torch.load(path)
         net_dict=network.state_dict()
         # 1. filter out unnecessary keys
